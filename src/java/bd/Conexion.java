@@ -20,118 +20,86 @@ import java.util.logging.Logger;
  * @author Lluis_2
  */
 public class Conexion {
+
     Connection connection;
-    
-    public Conexion()
-    {
+
+    public Conexion() {
         try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-                connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.180.10:1521:INSLAFERRERI", "PROFEA1","1234");
-               // connection = DriverManager.getConnection("jdbc:oracle:thin:@ieslaferreria.xtec.cat:8081:INSLAFERRERI", "PROFEA1","1234");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.180.10:1521:INSLAFERRERI", "edote", "1234");
+            // connection = DriverManager.getConnection("jdbc:oracle:thin:@ieslaferreria.xtec.cat:8081:INSLAFERRERI", "PROFEA1","1234");
         } catch (SQLException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-}
+
+    }
 
     public Connection getConnection() {
         return connection;
     }
-    
-    
-        public void finalizarConexion() throws SQLException
-        {
-            connection.close();
+
+    public void finalizarConexion() throws SQLException {
+        connection.close();
+    }
+
+    public boolean insertarCliente(Ubicaciones ubi) throws SQLException {
+        String sql = "INSERT INTO Ubicacion (matricula, latitud, longitud, data) VALUES (?, ?, ?, ?)";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, ubi.getMatricula());
+        stmt.setDouble(2, ubi.getLatitud());
+        stmt.setDouble(3, ubi.getLongitud());
+        stmt.setString(4,ubi.getData());
+        int res = stmt.executeUpdate();
+        finalizarConexion();
+
+        return (res == 1);
+    }
+
+    public List<Autobuses> obtenerAutobuses() throws SQLException {
+        ResultSet rset;
+        List<Autobuses> lista = new ArrayList();
+        String sql = "SELECT matricula FROM Autobus";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        rset = stmt.executeQuery();
+        while (rset.next()) {
+            lista.add(new Autobuses(rset.getString("matricula"), rset.getString("password")));
+
         }
-  
-        public  boolean insertarCliente(Cliente cli) throws SQLException
-{
-       String sql = "INSERT INTO Cliente (Nombre, Telefono) VALUES (?, ?)";
-       PreparedStatement stmt = connection.prepareStatement(sql);
-       stmt.setString(1, cli.getNombre()); //stmt.setString(1, cli.getNombre);
-       stmt.setInt(2, cli.getTelefono());
-       int res = stmt.executeUpdate();
-       finalizarConexion();
-           
- 
-      return (res == 1);
-}
+        finalizarConexion();
+        return lista;
+    }
 
-    
- 
-public List<Cliente> obtenerClientes() throws SQLException
-        
-{
-      ResultSet rset;
-      List<Cliente> lista = new ArrayList();
-      String sql = "SELECT IdCliente, Nombre, Telefono FROM Cliente";
-      PreparedStatement stmt = getConnection().prepareStatement(sql);
-      rset = stmt.executeQuery();
-      while (rset.next())
-      {
-          lista.add(new Cliente(rset.getInt("IdCliente"), rset.getString("Nombre"), rset.getInt("Telefono")));
-          
-      }
-      finalizarConexion();
-      return lista;
-}
- 
-    public Cliente obtenerCliente (int id) throws SQLException
-    {
-        Cliente cli = null;
-        
-      ResultSet rset;
-      
-      String sql = "SELECT IdCliente, Nombre, Telefono FROM Cliente WHERE idCliente = ?";
-      PreparedStatement stmt = getConnection().prepareStatement(sql);
-      stmt.setInt(1, id);
-      rset = stmt.executeQuery();
-      while (rset.next())
-      {
-          cli = new Cliente(rset.getInt("IdCliente"), rset.getString("Nombre"), rset.getInt("Telefono"));
-          
-      }
-      finalizarConexion();
-      return cli;
-        
-        
-    }
-    
-    public boolean actualizarCliente(Cliente cli) throws SQLException
-    {
-        boolean result;
-          String sql = "UPDATE cliente SET nombre = ?, telefono = ? WHERE idcliente = ?";
-       PreparedStatement stmt = connection.prepareStatement(sql);
-       stmt.setString(1, cli.getNombre()); //stmt.setString(1, cli.getNombre);
-       stmt.setInt(2, cli.getTelefono());
-       stmt.setInt(3, cli.getIdCliente());
-       
-       int res = stmt.executeUpdate();
-       if (res==0)  
-          result = insertarCliente(cli);
-       else
-           result = true;
-          
- 
-      return (result);
-    }
- 
-     
-  public boolean eliminarCliente(int id) throws SQLException
-    {
-       
-       String sql = "DELETE FROM cliente WHERE idcliente = ?";
-       PreparedStatement stmt = connection.prepareStatement(sql);
-       stmt.setInt(1, id);
-       
-       int res = stmt.executeUpdate();
-       
-      return (res==1);
-    }
-     
+    public Autobuses obtenerAutobus(String matricula) throws SQLException {
+        Autobuses aut = null;
 
-        
-    
+        ResultSet rset;
+
+        String sql = "SELECT matricula, password FROM Autobuses WHERE matricula = ?";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setString(1, matricula);
+        rset = stmt.executeQuery();
+        while (rset.next()) {            
+            aut = new Autobuses(rset.getString("matricula"),  rset.getString("password"));
+
+        }
+        finalizarConexion();
+        return aut;
+    }
+
+    public List<Ubicaciones> obtenerUbicacionBus(String matricula) throws SQLException{
+        ResultSet rset;
+        List<Ubicaciones> lista = new ArrayList();
+        String sql = "SELECT longitud, latitud, data FROM Cliente WHERE matricula = ?";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        rset = stmt.executeQuery();
+        while (rset.next()) {
+            lista.add(new Ubicaciones(rset.getString("matricula"), rset.getDouble("latitud"), rset.getDouble("longitud"), rset.getString("data")));
+
+        }
+        finalizarConexion();
+        return lista;
+    }
+
 }

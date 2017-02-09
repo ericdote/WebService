@@ -5,7 +5,8 @@
  */
 package rest;
 
-import bd.Cliente;
+import bd.Autobuses;
+import bd.Ubicaciones;
 import bd.Conexion;
 import com.google.gson.Gson;
 import java.sql.SQLException;
@@ -35,8 +36,6 @@ public class GenericResource {
 
     @Context
     private UriInfo context;
-  
-    
 
     /**
      * Creates a new instance of GenericResource
@@ -46,18 +45,51 @@ public class GenericResource {
 
     /**
      * Retrieves representation of an instance of rest.GenericResource
+     *
      * @return an instance of java.lang.String
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String listarClientes ()
-    {
-        
+    public String listarAutobuses() {
+
         Conexion conexion = new Conexion();
-        List<Cliente> lista = null;
+        List<Autobuses> lista = null;
         try {
-            lista = conexion.obtenerClientes();
-            
+            lista = conexion.obtenerAutobuses();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Gson gson = new Gson();
+
+        return gson.toJson(lista);
+    }
+
+    @GET
+    @Path("{matricula}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String mostrarBus(@PathParam("matricula") String matricula) {
+        Autobuses auto = null;
+        Conexion conexion = new Conexion();
+        try {
+            auto = conexion.obtenerAutobus(matricula);
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Gson gson = new Gson();
+
+        return gson.toJson(auto);
+    }
+    
+    @GET
+    @Path("{matricula}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String mostrarUbicacionAutobus(@PathParam("matricula") String matricula) {
+        Conexion conexion = new Conexion();
+        List<Ubicaciones> lista = null;
+
+        try {
+            lista = conexion.obtenerUbicacionBus(matricula);
         } catch (SQLException ex) {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -65,89 +97,4 @@ public class GenericResource {
         
         return gson.toJson(lista);
     }
-         
-       
-
-    /**
-     * PUT method for updating or creating an instance of GenericResource
-     * @param content representation for the resource
-     */
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean insertarCliente (String cli) {
-         Conexion conexion = new Conexion();
-         Gson gson = new Gson();
-         Cliente cliente;
-         cliente = gson.fromJson(cli, Cliente.class);
-         boolean result = true;
-        try {
-          
-            conexion.actualizarCliente(cliente);
-        } catch (SQLException ex) {
-            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
-            result = false;             
-        }
-        return result;
-    }
-     
-    @GET
-     @Path("{id}")
-     @Produces(MediaType.APPLICATION_JSON)
-     public String mostrarCliente(@PathParam("id") int id)
-     {
-         Cliente cli = null;
-          Conexion conexion = new Conexion();
-         try
-         {
-             cli = conexion.obtenerCliente(id);
-         }
-         catch (SQLException ex) {
-            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         Gson gson = new Gson();
-         
-         return gson.toJson(cli);
-     }
-     
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-     public boolean actualizarCliente(String cli)
-     {
-          Conexion conexion = new Conexion();
-         Gson gson = new Gson();
-         Cliente cliente;
-         cliente = gson.fromJson(cli, Cliente.class);
-         boolean result = true;
-        try {
-          
-            conexion.insertarCliente(cliente);
-        } catch (SQLException ex) {
-            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
-            result = false;
-            
-            
-            
-        }
-        return result;
-     }
-     
-@DELETE
-@Path("/delete/{id}")
- 
-  
-     public boolean eliminarCliente( @PathParam("id")int id)
-     {
-          Conexion conexion = new Conexion();
-          boolean result = true;
-            
-        try {
-          
-            conexion.eliminarCliente(id);
-        } catch (SQLException ex) {
-            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
-            result = false;
-            
-        }
-        return result;
-     }
 }
