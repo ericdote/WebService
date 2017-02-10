@@ -15,14 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
-import static javax.ws.rs.HttpMethod.POST;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
@@ -51,7 +46,6 @@ public class GenericResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String listarAutobuses() {
-
         Conexion conexion = new Conexion();
         List<Autobuses> lista = null;
         try {
@@ -77,12 +71,11 @@ public class GenericResource {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         Gson gson = new Gson();
-
         return gson.toJson(auto);
     }
     
     @GET
-    @Path("{matricula}")
+    @Path("ultima/{matricula}")
     @Produces(MediaType.APPLICATION_JSON)
     public String mostrarUbicacionAutobus(@PathParam("matricula") String matricula) {
         Conexion conexion = new Conexion();

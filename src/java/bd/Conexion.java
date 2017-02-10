@@ -26,14 +26,13 @@ public class Conexion {
     public Conexion() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.180.10:1521:INSLAFERRERI", "edote", "1234");
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.180.10:1521:INSLAFERRERI", "ericdote", "1234");
             // connection = DriverManager.getConnection("jdbc:oracle:thin:@ieslaferreria.xtec.cat:8081:INSLAFERRERI", "PROFEA1","1234");
         } catch (SQLException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public Connection getConnection() {
@@ -60,7 +59,7 @@ public class Conexion {
     public List<Autobuses> obtenerAutobuses() throws SQLException {
         ResultSet rset;
         List<Autobuses> lista = new ArrayList();
-        String sql = "SELECT matricula FROM Autobus";
+        String sql = "SELECT matricula FROM AUTOBUSES";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         rset = stmt.executeQuery();
         while (rset.next()) {
@@ -73,16 +72,14 @@ public class Conexion {
 
     public Autobuses obtenerAutobus(String matricula) throws SQLException {
         Autobuses aut = null;
-
         ResultSet rset;
-
-        String sql = "SELECT matricula, password FROM Autobuses WHERE matricula = ?";
+        String sql = "SELECT MATRICULA, PASSWORD FROM AUTOBUSES WHERE MATRICULA LIKE ?";
+        
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setString(1, matricula);
         rset = stmt.executeQuery();
         while (rset.next()) {            
-            aut = new Autobuses(rset.getString("matricula"),  rset.getString("password"));
-
+            aut = new Autobuses(rset.getString("MATRICULA"),  rset.getString("PASSWORD"));
         }
         finalizarConexion();
         return aut;
