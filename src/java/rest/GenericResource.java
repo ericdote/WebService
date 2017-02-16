@@ -10,13 +10,18 @@ import bd.Ubicaciones;
 import bd.Conexion;
 import com.google.gson.Gson;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
+import static javax.ws.rs.HttpMethod.POST;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
@@ -50,7 +55,6 @@ public class GenericResource {
         List<Autobuses> lista = null;
         try {
             lista = conexion.obtenerAutobuses();
-
         } catch (SQLException ex) {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -73,21 +77,37 @@ public class GenericResource {
         Gson gson = new Gson();
         return gson.toJson(auto);
     }
-    
+
     @GET
     @Path("ultima/{matricula}")
     @Produces(MediaType.APPLICATION_JSON)
     public String mostrarUbicacionAutobus(@PathParam("matricula") String matricula) {
         Conexion conexion = new Conexion();
         List<Ubicaciones> lista = null;
-
         try {
             lista = conexion.obtenerUbicacionBus(matricula);
         } catch (SQLException ex) {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         Gson gson = new Gson();
-        
+
         return gson.toJson(lista);
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public boolean insertarUbicacio (String ubi) throws ParseException {
+         Conexion conexion = new Conexion();
+         Gson gson = new Gson();
+         Ubicaciones ubicacio;
+         ubicacio = gson.fromJson(ubi, Ubicaciones.class);
+         boolean result = true;
+        try {          
+            conexion.insertarUbicacion(ubicacio);
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+            result = false;             
+        }
+        return result;
     }
 }

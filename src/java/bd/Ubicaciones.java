@@ -32,33 +32,21 @@ public class Ubicaciones {
         return matricula;
     }
 
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
 
     public double getLatitud() {
         return latitud;
     }
 
-    public void setLatitud(double latitud) {
-        this.latitud = latitud;
-    }
 
     public double getLongitud() {
         return longitud;
     }
 
-    public void setLongitud(double longitud) {
-        this.longitud = longitud;
-    }
 
     public String getData() {
         return data;
     }
 
-    public void setData(String data) {
-        this.data = data;
-    }
 
 
 

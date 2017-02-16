@@ -21,10 +21,10 @@ public class Autobuses {
     public String getMatricula() {
         return matricula;
     }
-
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
+//
+//    public void setMatricula(String matricula) {
+//        this.matricula = matricula;
+//    }
 
     public String getPassword() {
         return password;

@@ -10,7 +10,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,17 +46,23 @@ public class Conexion {
         connection.close();
     }
 
-    public boolean insertarCliente(Ubicaciones ubi) throws SQLException {
-        String sql = "INSERT INTO Ubicacion (matricula, latitud, longitud, data) VALUES (?, ?, ?, ?)";
+    public boolean insertarUbicacion(Ubicaciones ubi) throws SQLException, ParseException {
+        int res;
+        String sql = "INSERT INTO UBICACION VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql);
+        String date;
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         stmt.setString(1, ubi.getMatricula());
         stmt.setDouble(2, ubi.getLatitud());
         stmt.setDouble(3, ubi.getLongitud());
-        stmt.setString(4,ubi.getData());
-        int res = stmt.executeUpdate();
-        finalizarConexion();
-
+        date = ubi.getData();
+        Date data = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);        
+        java.sql.Date sDate = convertUtilToSql(data);
+        stmt.setDate(4, sDate);
+        res = stmt.executeUpdate();
         return (res == 1);
+
     }
 
     public List<Autobuses> obtenerAutobuses() throws SQLException {
@@ -74,18 +83,18 @@ public class Conexion {
         Autobuses aut = null;
         ResultSet rset;
         String sql = "SELECT MATRICULA, PASSWORD FROM AUTOBUSES WHERE MATRICULA LIKE ?";
-        
+
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setString(1, matricula);
         rset = stmt.executeQuery();
-        while (rset.next()) {            
-            aut = new Autobuses(rset.getString("MATRICULA"),  rset.getString("PASSWORD"));
+        while (rset.next()) {
+            aut = new Autobuses(rset.getString("MATRICULA"), rset.getString("PASSWORD"));
         }
         finalizarConexion();
         return aut;
     }
 
-    public List<Ubicaciones> obtenerUbicacionBus(String matricula) throws SQLException{
+    public List<Ubicaciones> obtenerUbicacionBus(String matricula) throws SQLException {
         ResultSet rset;
         List<Ubicaciones> lista = new ArrayList();
         String sql = "SELECT longitud, latitud, data FROM Cliente WHERE matricula = ?";
@@ -98,5 +107,13 @@ public class Conexion {
         finalizarConexion();
         return lista;
     }
+    
+    private  java.sql.Date convertUtilToSql(java.util.Date uDate) {
+
+        java.sql.Date sDate = new java.sql.Date(uDate.getTime());
+
+        return sDate;
+    }
+
 
 }
