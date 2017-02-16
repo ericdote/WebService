@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Lluis_2
  */
-@Path("generic")
+@Path("mapas")
 public class GenericResource {
 
     @Context
@@ -43,24 +43,20 @@ public class GenericResource {
     public GenericResource() {
     }
 
-    /**
-     * Retrieves representation of an instance of rest.GenericResource
-     *
-     * @return an instance of java.lang.String
-     */
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String listarAutobuses() {
         Conexion conexion = new Conexion();
-        List<Autobuses> lista = null;
+        List<Autobuses> aut = null;
         try {
-            lista = conexion.obtenerAutobuses();
+            aut = conexion.obtenerAutobuses();
+
         } catch (SQLException ex) {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         Gson gson = new Gson();
-
-        return gson.toJson(lista);
+        return aut.isEmpty() ? gson.toJson(false) : gson.toJson(aut);
     }
 
     @GET
@@ -75,23 +71,56 @@ public class GenericResource {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         Gson gson = new Gson();
-        return gson.toJson(auto);
+
+        return auto == null ? gson.toJson(false) : gson.toJson(auto);
     }
 
     @GET
-    @Path("ultima/{matricula}")
+    @Path("cincoUltimasPosiciones/{matricula}")
     @Produces(MediaType.APPLICATION_JSON)
     public String mostrarUbicacionAutobus(@PathParam("matricula") String matricula) {
+        List<Ubicaciones> ubi = null;
         Conexion conexion = new Conexion();
-        List<Ubicaciones> lista = null;
         try {
-            lista = conexion.obtenerUbicacionBus(matricula);
+            ubi = conexion.obtenerUbicacionBus(matricula);
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Gson gson = new Gson();
+        return ubi.isEmpty() ? gson.toJson(false) : gson.toJson(ubi);
+    }
+
+    @GET
+    @Path("todas/matriculas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String mostrarMatriculas() {
+        List<Autobuses> auto = null;
+        Conexion conexion = new Conexion();
+        try {
+            auto = conexion.obtenerAutobuses();
+
         } catch (SQLException ex) {
             Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         Gson gson = new Gson();
 
-        return gson.toJson(lista);
+        return auto.isEmpty() ? gson.toJson(false) : gson.toJson(auto);
+    }
+
+    @GET
+    @Path("ultima/posiciones")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String mostrarUltimasPosTodosBuses() {
+        List<Ubicaciones> auto = null;
+        Conexion conexion = new Conexion();
+        try {
+            auto = conexion.obtenerUltimaPosBuses();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Gson gson = new Gson();
+        return auto.isEmpty() ? gson.toJson(false) : gson.toJson(auto);
     }
     
     @POST
