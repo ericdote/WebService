@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bd;
 
 import java.sql.Connection;
@@ -19,8 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Lluis_2
+ * 
+ * @author Eric
  */
 public class Conexion {
 
@@ -106,7 +101,7 @@ public class Conexion {
     public List<Autobuses> obtenerAutobuses() throws SQLException {
         ResultSet rset;
         List<Autobuses> lista = new ArrayList();
-        String sql = "SELECT * FROM AUTOBUSES";
+        String sql = "SELECT * FROM AUTOBUSES ORDER BY MATRICULA ASC";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         rset = stmt.executeQuery();
         while (rset.next()) {
@@ -115,7 +110,12 @@ public class Conexion {
         finalizarConexion();
         return lista;
     }
-
+    /**
+     * Metodo utilizado para obtener un autobus en concreto.
+     * @param matricula
+     * @return
+     * @throws SQLException 
+     */
     public Autobuses obtenerAutobus(String matricula) throws SQLException {
         Autobuses aut = null;
         ResultSet rset;
